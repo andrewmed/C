@@ -119,6 +119,8 @@ class v(cmd_base):
     overwrite_mode = 'y'
 
     def overwrite(self, source):
+        if self.args and not os.path.exists(self.args[0]):
+            os.mkdir(self.args[0])
         to_dir = os.path.abspath(self.args[0]) if self.args else os.getcwd()
         dst = os.path.join(to_dir, os.path.basename(source))
         if os.path.exists(dst):

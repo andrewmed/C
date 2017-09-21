@@ -13,4 +13,4 @@ Inspired by [BOBUK](https://github.com/bobuk/c)
 * copy to bin directory and create symlinks for each command
 
 #### TODO
-* BUG: does not overwrite existing directories
+* BUG: does not overwrite existing dir
