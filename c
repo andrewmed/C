@@ -1,9 +1,9 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 import json
-import itertools
 import shutil
-import platform
 import datetime
 import stat
 import tty
@@ -11,7 +11,6 @@ import tty
 import termios
 
 BUFFER_NAME = os.path.expanduser('~/.c_copy_buffer')
-DISPLAY_THRESHOLD = 10
 
 COMMANDS = [
     '+c',
@@ -40,8 +39,6 @@ class COLORS:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
-
 
 
 def printColl(coll, color = COLORS.ENDC):
@@ -122,10 +119,7 @@ class v(cmd_base):
     overwrite_mode = 'y'
 
     def overwrite(self, source):
-        if self.args:
-            to_dir = os.path.abspath(self.args[0])
-        else:
-            to_dir = os.getcwd()
+        to_dir = os.path.abspath(self.args[0]) if self.args else os.getcwd()
         dst = os.path.join(to_dir, os.path.basename(source))
         if os.path.exists(dst):
             if not self.overwrite_mode in {'Y', 'N'}:
@@ -154,7 +148,6 @@ class v(cmd_base):
 
         if len(self.args) > 1:
             raise Exception('only one parameter allowed')
-
         try:
             for src in dirs_coll:
                 dst, write = self.overwrite(src)
@@ -174,7 +167,6 @@ class v(cmd_base):
                     continue
                 shutil.copy2(src, dst)
                 self.files.remove(src)
-
         finally:
             colorText('%s files %s dirs copied, %s skipped' % (len(file_coll) - len(self.files), len(dirs_coll) - len(self.dirs), skipped), COLORS.BOLD)
 
@@ -201,7 +193,6 @@ class DEL(cmd_base):
             for source in file_coll:
                 os.remove(source)
                 self.files.remove(source)
-
             for source in dirs_coll:
                 shutil.rmtree(source)
                 self.dirs.remove(source)
@@ -236,7 +227,7 @@ class p(cmd_base):
 def main(argv):
     callname = os.path.basename(argv[0])
     if callname not in COMMANDS:
-        raise Exception('only following commands accepted: %s' % ' '.join(COMMANDS))
+        raise Exception('only following commands are accepted: %s' % ' '.join(COMMANDS))
     cmd = eval(callname[1:])(argv[1:])
     cmd.do()
 
@@ -245,6 +236,6 @@ if __name__ == '__main__':
         if __name__ == '__main__':
             main(sys.argv)
     except Exception as e:
-        sys.stderr.write( '%s%s%s%s' % (COLORS.FAIL, str(e), COLORS.ENDC, '\n'))
+        colorText(e, COLORS.FAIL)
         exit(-1)
 
